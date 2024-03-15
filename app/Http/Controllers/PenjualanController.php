@@ -18,7 +18,7 @@ class PenjualanController extends Controller
 
     public function data()
     {
-        $penjualan = Penjualan::with('member')->orderBy('id_penjualan', 'desc')->get();
+        $penjualan = Penjualan::with('member')->where('total_item', '!=', 0)->orderBy('id_penjualan', 'desc')->get();
 
         return datatables()
             ->of($penjualan)
@@ -75,13 +75,38 @@ class PenjualanController extends Controller
 
     public function store(Request $request)
     {
+
+        // Mendapatkan tanggal hari ini
+        $tanggal = now()->format('Ymd');
+
+        // Mendapatkan jumlah penjualan pada tanggal yang sama
+        $count = Penjualan::whereDate('created_at', now())->count() + 1;
+
+        // Mengecek apakah tanggal sebelumnya sama dengan tanggal hari ini
+        $previousDate = Penjualan::latest()->value('created_at');
+        $previousTanggal = $previousDate ? $previousDate->format('Ymd') : null;
+
+        if ($previousTanggal != $tanggal) {
+            // Jika tanggal berganti, reset nomor urut ke 1
+            $count = 1;
+        }
+
+        // Menghasilkan kode bill dengan nomor urut yang sesuai
+        $kode_bill = $tanggal . str_pad($count, 3, '0', STR_PAD_LEFT);
+
+        
+
+
         $penjualan = Penjualan::findOrFail($request->id_penjualan);
+
         $penjualan->id_member = $request->id_member;
         $penjualan->total_item = $request->total_item;
         $penjualan->total_harga = $request->total;
         $penjualan->diskon = $request->diskon;
         $penjualan->bayar = $request->bayar;
         $penjualan->diterima = $request->diterima;
+        // Menetapkan kode bill pada objek penjualan
+        $penjualan->kode_bill = $kode_bill;
         $penjualan->update();
 
         $detail = PenjualanDetail::where('id_penjualan', $penjualan->id_penjualan)->get();

@@ -11,14 +11,31 @@ use PDF;
 
 class PenjualanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('penjualan.index');
+        $tanggalAwal = date('Y-m-d', mktime(0, 0, 0, date('m'), 1, date('Y')));
+        $tanggalAkhir = date('Y-m-d');
+
+        if ($request->has('tanggal_awal') && $request->tanggal_awal != "" && $request->has('tanggal_akhir') && $request->tanggal_akhir) {
+            $tanggalAwal = $request->tanggal_awal;
+            $tanggalAkhir = $request->tanggal_akhir;
+        }
+
+        return view('penjualan.index', compact('tanggalAwal', 'tanggalAkhir'));
     }
 
-    public function data()
+    public function data(Request $request)
     {
-        $penjualan = Penjualan::with('member')->where('total_item', '!=', 0)->orderBy('id_penjualan', 'desc')->get();
+        $query = Penjualan::with('member')->where('total_item', '!=', 0)->orderBy('id_penjualan', 'desc');
+
+        if ($request->has('tanggal_awal') && $request->has('tanggal_akhir')) {
+            $tanggalAwal = $request->input('tanggal_awal');
+            $tanggalAkhir = $request->input('tanggal_akhir');
+            $query->whereDate('created_at', '>=', $tanggalAwal)
+                ->whereDate('created_at', '<=', $tanggalAkhir);
+        }
+
+        $penjualan = $query->get();
 
         return datatables()
             ->of($penjualan)
@@ -59,17 +76,17 @@ class PenjualanController extends Controller
 
     public function create()
     {
-        // $penjualan = new Penjualan();
-        // $penjualan->id_member = null;
-        // $penjualan->total_item = 0;
-        // $penjualan->total_harga = 0;
-        // $penjualan->diskon = 0;
-        // $penjualan->bayar = 0;
-        // $penjualan->diterima = 0;
-        // $penjualan->id_user = auth()->id();
-        // $penjualan->save();
+        $penjualan = new Penjualan();
+        $penjualan->id_member = null;
+        $penjualan->total_item = 0;
+        $penjualan->total_harga = 0;
+        $penjualan->diskon = 0;
+        $penjualan->bayar = 0;
+        $penjualan->diterima = 0;
+        $penjualan->id_user = auth()->id();
+        $penjualan->save();
 
-        // session(['id_penjualan' => $penjualan->id_penjualan]);
+        session(['id_penjualan' => $penjualan->id_penjualan]);
         return redirect()->route('transaksi.index');
     }
 

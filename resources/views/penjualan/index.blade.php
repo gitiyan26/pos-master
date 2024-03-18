@@ -4,6 +4,10 @@
     Daftar Penjualan
 @endsection
 
+@push('css')
+<link rel="stylesheet" href="{{ asset('/AdminLTE-2/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
+@endpush
+
 @section('breadcrumb')
     @parent
     <li class="active">Daftar Penjualan</li>
@@ -14,6 +18,9 @@
     <div class="col-lg-12">
         <div class="box">
             <div class="box-body table-responsive">
+                <button class="btn btn-info btn-xs btn-flat" data-toggle="modal" data-target="#modalTanggal"><i class="fa fa-calendar"></i> Pilih Tanggal</button>  
+                <br>
+                <br>
                 <table class="table table-stiped table-bordered table-penjualan">
                     <thead>
                         <th width="5%">No</th>
@@ -32,10 +39,36 @@
     </div>
 </div>
 
+<!-- Modal -->
+<div id="modalTanggal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Pilih Rentang Tanggal</h4>
+            </div>
+            <div class="modal-body">
+                <form id="filterForm">
+                    <div class="form-group">
+                        <label for="tanggal_awal">Tanggal Awal:</label>
+                        <input type="date" class="form-control datepicker" id="tanggal_awal" name="tanggal_awal" value="{{ $tanggalAwal }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="tanggal_akhir">Tanggal Akhir:</label>
+                        <input type="date" class="form-control datepicker" id="tanggal_akhir" name="tanggal_akhir" value="{{ $tanggalAkhir }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @includeIf('penjualan.detail')
 @endsection
 
 @push('scripts')
+<script src="{{ asset('/AdminLTE-2/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
 <script>
     let table, table1;
 
@@ -74,6 +107,15 @@
                 {data: 'subtotal'},
             ]
         })
+
+        $('#filterForm').submit(function (e) {
+            e.preventDefault();
+            
+            var tanggalAwal = $('#tanggal_awal').val();
+            var tanggalAkhir = $('#tanggal_akhir').val();
+            
+            table.ajax.url('{{ route('penjualan.data') }}?tanggal_awal=' + tanggalAwal + '&tanggal_akhir=' + tanggalAkhir).load();
+        });
     });
 
     function showDetail(url) {

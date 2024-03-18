@@ -8,6 +8,8 @@ use App\Models\Produk;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use PDF;
+use Illuminate\Support\Facades\Auth;
+
 
 class PenjualanController extends Controller
 {
@@ -16,13 +18,35 @@ class PenjualanController extends Controller
         $tanggalAwal = date('Y-m-d', mktime(0, 0, 0, date('m'), 1, date('Y')));
         $tanggalAkhir = date('Y-m-d');
 
-        if ($request->has('tanggal_awal') && $request->tanggal_awal != "" && $request->has('tanggal_akhir') && $request->tanggal_akhir) {
-            $tanggalAwal = $request->tanggal_awal;
-            $tanggalAkhir = $request->tanggal_akhir;
+        if ($request->has('tanggal_awal') && $request->has('tanggal_akhir')) {
+            $tanggalAwal = $request->input('tanggal_awal');
+            $tanggalAkhir = $request->input('tanggal_akhir');
         }
 
-        return view('penjualan.index', compact('tanggalAwal', 'tanggalAkhir'));
+        $query = Penjualan::with('member')
+            ->where('total_item', '!=', 0)
+            ->whereDate('created_at', '>=', $tanggalAwal)
+            ->whereDate('created_at', '<=', $tanggalAkhir)
+            ->orderBy('id_penjualan', 'desc');
+
+        // Validasi peran pengguna
+        if (Auth::user()->level == 1) {
+            // Admin - tampilkan semua data kasir
+            $penjualan = $query->get();
+        } elseif (Auth::user()->level == 2) {
+            // User biasa - tampilkan data kasir sesuai dengan user
+            $penjualan = $query->whereHas('user', function ($query) {
+                $query->where('id', Auth::id());
+            })->get();
+
+        }
+
+        // Hitung total pendapatan (total bayar)
+        $totalPendapatan = $penjualan->sum('bayar');
+
+        return view('penjualan.index', compact('tanggalAwal', 'tanggalAkhir', 'penjualan', 'totalPendapatan'));
     }
+
 
     public function data(Request $request)
     {

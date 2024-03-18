@@ -33,6 +33,39 @@
                         <th>Kasir</th>
                         <th width="15%"><i class="fa fa-cog"></i></th>
                     </thead>
+                    <tbody>
+                    @foreach ($penjualan as $index => $data)
+                        <tr>
+                            <td>{{ $index + 1 }}</td>
+                            <td>{{ tanggal_indonesia($data->created_at, false) }}</td>
+                            <td>{{ $data->member->kode_member ?? '-' }}</td>
+                            <td>{{ format_uang($data->total_item) }}</td>
+                            <td>Rp. {{ format_uang($data->total_harga) }}</td>
+                            <td>{{ $data->diskon }}%</td>
+                            <td>Rp. {{ format_uang($data->bayar) }}</td>
+                            <td>{{ $data->user->name ?? '-' }}</td>
+                            <td>
+                            @if(auth()->user()->level == 2)
+                                <div class="btn-group">
+                                    <button onclick="showDetail('{{ route('penjualan.show', $data->id_penjualan) }}')" class="btn btn-xs btn-info btn-flat"><i class="fa fa-eye"></i></button>
+                                </div>
+                            @elseif(auth()->user()->level == 1)
+                                <div class="btn-group">
+                                    <button onclick="showDetail('{{ route('penjualan.show', $data->id_penjualan) }}')" class="btn btn-xs btn-info btn-flat"><i class="fa fa-eye"></i></button>
+                                    <button onclick="deleteData('{{ route('penjualan.destroy', $data->id_penjualan) }}')" class="btn btn-xs btn-danger btn-flat"><i class="fa fa-trash"></i></button>
+                                </div>
+                            @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="6"><strong>Total:</strong></td>
+                            <td>Rp. {{ format_uang($totalPendapatan) }}</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
@@ -70,30 +103,9 @@
 @push('scripts')
 <script src="{{ asset('/AdminLTE-2/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
 <script>
-    let table, table1;
+    let table1;
 
     $(function () {
-        table = $('.table-penjualan').DataTable({
-            responsive: true,
-            processing: true,
-            serverSide: true,
-            autoWidth: false,
-            ajax: {
-                url: '{{ route('penjualan.data') }}',
-            },
-            columns: [
-                {data: 'DT_RowIndex', searchable: false, sortable: false},
-                {data: 'tanggal'},
-                {data: 'kode_member'},
-                {data: 'total_item'},
-                {data: 'total_harga'},
-                {data: 'diskon'},
-                {data: 'bayar'},
-                {data: 'kasir'},
-                {data: 'aksi', searchable: false, sortable: false},
-            ]
-        });
-
         table1 = $('.table-detail').DataTable({
             processing: true,
             bSort: false,
@@ -114,7 +126,7 @@
             var tanggalAwal = $('#tanggal_awal').val();
             var tanggalAkhir = $('#tanggal_akhir').val();
             
-            table.ajax.url('{{ route('penjualan.data') }}?tanggal_awal=' + tanggalAwal + '&tanggal_akhir=' + tanggalAkhir).load();
+            window.location.href = '{{ route('penjualan.index') }}?tanggal_awal=' + tanggalAwal + '&tanggal_akhir=' + tanggalAkhir;
         });
     });
 
@@ -132,7 +144,7 @@
                     '_method': 'delete'
                 })
                 .done((response) => {
-                    table.ajax.reload();
+                    window.location.reload();
                 })
                 .fail((errors) => {
                     alert('Tidak dapat menghapus data');

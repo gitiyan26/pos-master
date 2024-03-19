@@ -15,7 +15,7 @@ class PenjualanController extends Controller
 {
     public function index(Request $request)
     {
-        $tanggalAwal = date('Y-m-d', mktime(0, 0, 0, date('m'), 1, date('Y')));
+        $tanggalAwal = date('Y-m-d');
         $tanggalAkhir = date('Y-m-d');
 
         if ($request->has('tanggal_awal') && $request->has('tanggal_akhir')) {
@@ -38,7 +38,6 @@ class PenjualanController extends Controller
             $penjualan = $query->whereHas('user', function ($query) {
                 $query->where('id', Auth::id());
             })->get();
-
         }
 
         // Hitung total pendapatan (total bayar)
@@ -46,6 +45,7 @@ class PenjualanController extends Controller
 
         return view('penjualan.index', compact('tanggalAwal', 'tanggalAkhir', 'penjualan', 'totalPendapatan'));
     }
+
 
 
     public function data(Request $request)

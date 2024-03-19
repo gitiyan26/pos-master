@@ -18,7 +18,9 @@
     <div class="col-lg-12">
         <div class="box">
             <div class="box-body table-responsive">
+                @if(auth()->user()->level == 1)
                 <button class="btn btn-info btn-xs btn-flat" data-toggle="modal" data-target="#modalTanggal"><i class="fa fa-calendar"></i> Pilih Tanggal</button>  
+                @endif
                 <br>
                 <br>
                 <table class="table table-stiped table-bordered table-penjualan">

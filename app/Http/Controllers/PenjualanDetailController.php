@@ -24,13 +24,11 @@ class PenjualanDetailController extends Controller
 
             return view('penjualan_detail.index', compact('produk', 'member', 'diskon', 'id_penjualan', 'penjualan', 'memberSelected'));
         } else {
-            if (auth()->user()->level == 1) {
-                return redirect()->route('transaksi.baru');
-            } else {
-                return redirect()->route('home');
-            }
+            // Jika tidak ada transaksi berjalan, arahkan ke halaman transaksi baru
+            return redirect()->route('transaksi.baru');
         }
     }
+
 
     public function data($id)
     {

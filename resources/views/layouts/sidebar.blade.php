@@ -1,3 +1,8 @@
+@php
+    // Ambil total item dari penjualan terakhir
+    $lastPenjualan = App\Models\Penjualan::latest()->first();
+    $totalItemPenjualanTerakhir = $lastPenjualan ? $lastPenjualan->total_item : 0;
+@endphp
 <!-- Left side column. contains the logo and sidebar -->
 <aside class="main-sidebar">
     <!-- sidebar: style can be found in sidebar.less -->
@@ -60,16 +65,21 @@
                     <i class="fa fa-upload"></i> <span>Penjualan</span>
                 </a>
             </li>
-            <li>
-                <a href="{{ route('transaksi.index') }}">
-                    <i class="fa fa-cart-arrow-down"></i> <span>Transaksi Aktif</span>
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('transaksi.baru') }}">
-                    <i class="fa fa-cart-arrow-down"></i> <span>Transaksi Baru</span>
-                </a>
-            </li>
+            @if ($totalItemPenjualanTerakhir > 0)
+                {{-- Jika total item dari penjualan terakhir lebih besar dari 0, tampilkan tautan "Transaksi Baru" --}}
+                <li>
+                    <a href="{{ route('transaksi.baru') }}">
+                        <i class="fa fa-cart-arrow-down"></i> <span>Transaksi Baru</span>
+                    </a>
+                </li>
+            @else
+                {{-- Jika total item dari penjualan terakhir sama dengan 0, tampilkan tautan "Transaksi Aktif" --}}
+                <li>
+                    <a href="{{ route('transaksi.index') }}">
+                        <i class="fa fa-cart-arrow-down"></i> <span>Transaksi Aktif</span>
+                    </a>
+                </li>
+            @endif
             <li class="header">REPORT</li>
             <li>
                 <a href="{{ route('laporan.index') }}">
@@ -98,11 +108,23 @@
                     <i class="fa fa-upload"></i> <span>Penjualan</span>
                 </a>
             </li>
-            <li>
-                <a href="{{ route('transaksi.baru') }}">
-                    <i class="fa fa-cart-arrow-down"></i> <span>Transaksi Baru</span>
-                </a>
-            </li>
+        
+            @if ($totalItemPenjualanTerakhir > 0)
+                {{-- Jika total item dari penjualan terakhir lebih besar dari 0, tampilkan tautan "Transaksi Baru" --}}
+                <li>
+                    <a href="{{ route('transaksi.baru') }}">
+                        <i class="fa fa-cart-arrow-down"></i> <span>Transaksi Baru</span>
+                    </a>
+                </li>
+            @else
+                {{-- Jika total item dari penjualan terakhir sama dengan 0, tampilkan tautan "Transaksi Aktif" --}}
+                <li>
+                    <a href="{{ route('transaksi.index') }}">
+                        <i class="fa fa-cart-arrow-down"></i> <span>Transaksi Aktif</span>
+                    </a>
+                </li>
+            @endif
+        
             @endif
         </ul>
     </section>

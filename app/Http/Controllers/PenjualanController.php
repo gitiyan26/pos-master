@@ -29,6 +29,14 @@ class PenjualanController extends Controller
             ->whereDate('created_at', '<=', $tanggalAkhir)
             ->orderBy('id_penjualan', 'desc');
 
+        // Filter berdasarkan metode pembayaran jika ada parameter payment_method yang dikirim melalui URL
+        if ($request->has('payment_method')) {
+            $paymentMethod = $request->input('payment_method');
+            if ($paymentMethod != '') { // 'all' adalah nilai default jika tidak ada filter
+                $query->where('payment_method', $paymentMethod);
+            }
+        }
+
         // Validasi peran pengguna
         if (Auth::user()->level == 1) {
             // Admin - tampilkan semua data kasir
@@ -106,7 +114,10 @@ class PenjualanController extends Controller
         $penjualan->total_harga = 0;
         $penjualan->diskon = 0;
         $penjualan->bayar = 0;
-        $penjualan->diterima = 0;
+        $penjualan->kode_bill = 0;
+        $penjualan->nama = null;
+        $penjualan->usia = null;
+        $penjualan->payment_method = 'cash';
         $penjualan->id_user = auth()->id();
         $penjualan->save();
 
@@ -146,6 +157,9 @@ class PenjualanController extends Controller
         $penjualan->diskon = $request->diskon;
         $penjualan->bayar = $request->bayar;
         $penjualan->diterima = $request->diterima;
+        $penjualan->nama = $request->nama;
+        $penjualan->usia = $request->usia;
+        $penjualan->payment_method = $request->payment_method;
         // Menetapkan kode bill pada objek penjualan
         $penjualan->kode_bill = $kode_bill;
         $penjualan->update();

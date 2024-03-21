@@ -19,7 +19,10 @@
         <div class="box">
             <div class="box-body table-responsive">
                 @if(auth()->user()->level == 1)
-                <button class="btn btn-info btn-xs btn-flat" data-toggle="modal" data-target="#modalTanggal"><i class="fa fa-calendar"></i> Pilih Tanggal</button>  
+                <button class="btn btn-info btn-xs btn-flat" data-toggle="modal" data-target="#modalTanggal"><i class="fa fa-calendar"></i> Pilih Tanggal</button> 
+                <button class="btn btn-primary btn-xs btn-flat" data-toggle="modal" data-target="#modalPaymentMethod"><i class="fa fa-money"></i> Filter Metode Pembayaran</button>
+                @else
+                <button class="btn btn-primary btn-xs btn-flat" data-toggle="modal" data-target="#modalPaymentMethod"><i class="fa fa-money"></i> Filter Metode Pembayaran</button>
                 @endif
                 <br>
                 <br>
@@ -27,6 +30,9 @@
                     <thead>
                         <th width="5%">No</th>
                         <th>Tanggal</th>
+                        <th>Nama</th>
+                        <th>Usia</th>
+                        <th>Metode Pembayaran</th>
                         <th>Kode Member</th>
                         <th>Total Item</th>
                         <th>Total Harga</th>
@@ -40,6 +46,9 @@
                         <tr>
                             <td>{{ $index + 1 }}</td>
                             <td>{{ tanggal_indonesia($data->created_at, false) }}</td>
+                            <td>{{ ucfirst($data->nama) }}</td>
+                            <td>{{ ($data->usia) }}</td>
+                            <td>{{ ucfirst($data->payment_method) }}</td>
                             <td>{{ $data->member->kode_member ?? '-' }}</td>
                             <td>{{ format_uang($data->total_item) }}</td>
                             <td>Rp. {{ format_uang($data->total_harga) }}</td>
@@ -99,6 +108,32 @@
     </div>
 </div>
 
+<!-- Modal -->
+<div id="modalPaymentMethod" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Pilih Metode Pembayaran</h4>
+            </div>
+            <div class="modal-body">
+                <form id="filterPaymentMethodForm">
+                    <div class="form-group">
+                        <label for="payment_method">Metode Pembayaran:</label>
+                        <select class="form-control" id="payment_method" name="payment_method">
+                            <option value="">Semua</option>
+                            <option value="cash">Cash</option>
+                            <option value="qris">Qris</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 @includeIf('penjualan.detail')
 @endsection
 
@@ -129,6 +164,15 @@
             var tanggalAkhir = $('#tanggal_akhir').val();
             
             window.location.href = '{{ route('penjualan.index') }}?tanggal_awal=' + tanggalAwal + '&tanggal_akhir=' + tanggalAkhir;
+        });
+
+        $('#filterPaymentMethodForm').submit(function (e) {
+            e.preventDefault();
+
+            var paymentMethod = $('#payment_method').val();
+
+            // Redirect to filtered URL
+            window.location.href = '{{ route('penjualan.index') }}?payment_method=' + paymentMethod;
         });
     });
 

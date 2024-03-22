@@ -93,12 +93,6 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="usia" class="col-lg-2 control-label">Usia</label>
-                                <div class="col-lg-8">
-                                    <input type="number" id="usia" class="form-control" name="usia">
-                                </div>
-                            </div>
-                            <div class="form-group row">
                                 <label for="payment_method" class="col-lg-2 control-label">Payment method</label>
                                 <div class="col-lg-8">
                                     <select id="payment_method" class="form-control" name="payment_method">

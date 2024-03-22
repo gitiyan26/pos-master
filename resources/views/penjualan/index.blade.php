@@ -33,7 +33,6 @@
                         <th width="5%">No</th>
                         <th>Tanggal</th>
                         <th>Nama</th>
-                        <th>Usia</th>
                         <th>Metode Pembayaran</th>
                         <th>Kode Member</th>
                         <th>Total Item</th>
@@ -49,7 +48,6 @@
                             <td>{{ $index + 1 }}</td>
                             <td>{{ tanggal_indonesia($data->created_at, false) }}</td>
                             <td>{{ ucfirst($data->nama) }}</td>
-                            <td>{{ ($data->usia) }}</td>
                             <td>{{ ucfirst($data->payment_method) }}</td>
                             <td>{{ $data->member->kode_member ?? '-' }}</td>
                             <td>{{ format_uang($data->total_item) }}</td>
@@ -261,8 +259,7 @@
                         <td style="border-right: 1px solid #ddd; font-size: 9px;">${$(this).find('td:eq(5)').text()}</td>
                         <td style="border-right: 1px solid #ddd; font-size: 9px;">${$(this).find('td:eq(6)').text()}</td>
                         <td style="border-right: 1px solid #ddd; font-size: 9px;">${$(this).find('td:eq(7)').text()}</td>
-                        <td style="border-right: 1px solid #ddd; font-size: 9px;">${$(this).find('td:eq(8)').text()}</td>
-                        <td style="font-size: 9px;">${$(this).find('td:eq(9)').text()}</td>
+                        <td style="font-size: 9px;">${$(this).find('td:eq(8)').text()}</td>
                     </tr>`;
             });
 
@@ -277,7 +274,6 @@
                             <th style="border-right: 1px solid #ddd; font-size: 9px;">No</th>
                             <th style="border-right: 1px solid #ddd; font-size: 9px;">Tanggal</th>
                             <th style="border-right: 1px solid #ddd; font-size: 9px;">Nama</th>
-                            <th style="border-right: 1px solid #ddd; font-size: 9px;">Usia</th>
                             <th style="border-right: 1px solid #ddd; font-size: 9px;">Metode Pembayaran</th>
                             <th style="border-right: 1px solid #ddd; font-size: 9px;">Kode Member</th>
                             <th style="border-right: 1px solid #ddd; font-size: 9px;">Total Item</th>
@@ -299,7 +295,7 @@
 
             // Menambahkan tfoot hanya di halaman terakhir
             if ($('.table-penjualan').DataTable().page.info().end === $('.table-penjualan tbody tr').length) {
-                newWindow.document.write('<table style="width: 100%; border-collapse: collapse;"><tfoot>' + tfootHtml + '</tfoot></table>');
+                newWindow.document.write('<table style="width: 100%; border-collapse: collapse; font-size: 9px;"><tfoot>' + tfootHtml + '</tfoot></table>');
             }
             
             newWindow.document.write('</body></html>');

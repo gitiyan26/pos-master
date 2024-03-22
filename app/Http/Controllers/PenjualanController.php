@@ -116,7 +116,6 @@ class PenjualanController extends Controller
         $penjualan->bayar = 0;
         $penjualan->kode_bill = 0;
         $penjualan->nama = null;
-        $penjualan->usia = null;
         $penjualan->payment_method = 'cash';
         $penjualan->id_user = auth()->id();
         $penjualan->save();
@@ -158,7 +157,6 @@ class PenjualanController extends Controller
         $penjualan->bayar = $request->bayar;
         $penjualan->diterima = $request->diterima;
         $penjualan->nama = $request->nama;
-        $penjualan->usia = $request->usia;
         $penjualan->payment_method = $request->payment_method;
         // Menetapkan kode bill pada objek penjualan
         $penjualan->kode_bill = $kode_bill;

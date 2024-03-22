@@ -19,7 +19,7 @@
         <div class="box">
             <div class="box-header with-border">
                 <button onclick="updatePeriode()" class="btn btn-info btn-xs btn-flat"><i class="fa fa-plus-circle"></i> Ubah Periode</button>
-                <a href="{{ route('laporan.export_pdf', [$tanggalAwal, $tanggalAkhir]) }}" target="_blank" class="btn btn-success btn-xs btn-flat"><i class="fa fa-file-excel-o"></i> Export PDF</a>
+                <button id="printPDF" class="btn btn-success btn-xs btn-flat"><i class="fa fa-file-pdf"></i> Print PDF</button>
             </div>
             <div class="box-body table-responsive">
                 <table class="table table-stiped table-bordered">
@@ -76,5 +76,63 @@
     function updatePeriode() {
         $('#modal-form').modal('show');
     }
+</script>
+<script>
+    $(document).ready(function() {
+        $('#printPDF').click(function() {
+            // Mendapatkan HTML dari kolom yang diinginkan
+            var tbodyHtml = '';
+            $('.table tbody tr').each(function(index) {
+                tbodyHtml += `
+                    <tr>
+                        <td style="border-right: 1px solid #ddd; font-size: 9px;">${$(this).find('td:eq(0)').text()}</td>
+                        <td style="border-right: 1px solid #ddd; font-size: 9px;">${$(this).find('td:eq(1)').text()}</td>
+                        <td style="border-right: 1px solid #ddd; font-size: 9px;">${$(this).find('td:eq(2)').text()}</td>
+                        <td style="border-right: 1px solid #ddd; font-size: 9px;">${$(this).find('td:eq(3)').text()}</td>
+                        <td style="border-right: 1px solid #ddd; font-size: 9px;">${$(this).find('td:eq(4)').text()}</td>
+                        <td style="font-size: 9px;">${$(this).find('td:eq(5)').text()}</td>
+                    </tr>`;
+            });
+
+            // Mendapatkan HTML dari total pendapatan
+            // var tfootHtml = $('.table tfoot').html();
+
+            // Membuat konten untuk tabel dengan menambahkan thead dan tbody
+            var tableHtml = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th style="border-right: 1px solid #ddd; font-size: 9px;">No</th>
+                            <th style="border-right: 1px solid #ddd; font-size: 9px;">Tanggal</th>
+                            <th style="border-right: 1px solid #ddd; font-size: 9px;">Penjualan</th>
+                            <th style="border-right: 1px solid #ddd; font-size: 9px;">Pembelian</th>
+                            <th style="border-right: 1px solid #ddd; font-size: 9px;">Pengeluaran</th>
+                            <th style="border-right: 1px solid #ddd; font-size: 9px;">Pendapatan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tbodyHtml}
+                    </tbody>
+                </table>`;
+
+            // Membuka jendela baru untuk mencetak laporan
+            var newWindow = window.open('', '_blank');
+            newWindow.document.write('<html><head><title>Laporan Pendapatan</title><style>body { font-family: Arial, sans-serif; } table { width: 100%; border-collapse: collapse; } th, td { padding: 4px; text-align: left; border-bottom: 1px solid #ddd; } th { background-color: #f2f2f2; }</style></head><body>');
+            newWindow.document.write('<h1 style="text-align: center; font-size: 12px;">Laporan Pendapatan</h1>');
+            newWindow.document.write(tableHtml);
+
+            // Menambahkan tfoot hanya di halaman terakhir
+            // if ($('.table').DataTable().page.info().end === $('.table tbody tr').length) {
+            //     newWindow.document.write('<table style="width: 100%; border-collapse: collapse;"><tfoot>' + tfootHtml + '</tfoot></table>');
+            // }
+            
+            newWindow.document.write('</body></html>');
+            newWindow.document.close();
+
+            // Mencetak laporan
+            newWindow.print();
+        });
+    });
+
 </script>
 @endpush

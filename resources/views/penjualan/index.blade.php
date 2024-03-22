@@ -19,8 +19,10 @@
         <div class="box">
             <div class="box-body table-responsive">
                 @if(auth()->user()->level == 1)
-                <button class="btn btn-info btn-xs btn-flat" data-toggle="modal" data-target="#modalTanggal"><i class="fa fa-calendar"></i> Pilih Tanggal</button> 
-                <button class="btn btn-primary btn-xs btn-flat" data-toggle="modal" data-target="#modalPaymentMethod"><i class="fa fa-money"></i> Filter Metode Pembayaran</button>
+                <button class="btn btn-info btn-xs btn-flat" data-toggle="modal" data-target="#modalFilter"><i class="fa fa-filter"></i> Filter</button> 
+                {{-- <button class="btn btn-primary btn-xs btn-flat" data-toggle="modal" data-target="#modalPaymentMethod"><i class="fa fa-money"></i> Filter Metode Pembayaran</button> --}}
+                <button id="printPDF" class="btn btn-success btn-xs btn-flat"><i class="fa fa-file-pdf"></i> Print PDF</button>
+
                 @else
                 <button class="btn btn-primary btn-xs btn-flat" data-toggle="modal" data-target="#modalPaymentMethod"><i class="fa fa-money"></i> Filter Metode Pembayaran</button>
                 @endif
@@ -133,6 +135,40 @@
     </div>
 </div>
 
+<!-- Modal -->
+<div id="modalFilter" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Filter Data Penjualan</h4>
+            </div>
+            <div class="modal-body">
+                <form id="filterForm">
+                    <div class="form-group">
+                        <label for="tanggal_awal">Tanggal Awal:</label>
+                        <input type="date" class="form-control datepicker" id="tanggal_awal" name="tanggal_awal" value="{{ $tanggalAwal }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="tanggal_akhir">Tanggal Akhir:</label>
+                        <input type="date" class="form-control datepicker" id="tanggal_akhir" name="tanggal_akhir" value="{{ $tanggalAkhir }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="payment_method">Metode Pembayaran:</label>
+                        <select class="form-control" id="payment_method" name="payment_method">
+                            <option value="">Semua</option>
+                            <option value="cash">Cash</option>
+                            <option value="qris">Qris</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 @includeIf('penjualan.detail')
 @endsection
@@ -162,9 +198,19 @@
             
             var tanggalAwal = $('#tanggal_awal').val();
             var tanggalAkhir = $('#tanggal_akhir').val();
+            var paymentMethod = $('#payment_method').val();
             
-            window.location.href = '{{ route('penjualan.index') }}?tanggal_awal=' + tanggalAwal + '&tanggal_akhir=' + tanggalAkhir;
+            var url = '{{ route('penjualan.index') }}?tanggal_awal=' + tanggalAwal + '&tanggal_akhir=' + tanggalAkhir;
+
+            // Tambahkan parameter metode pembayaran jika dipilih
+            if (paymentMethod) {
+                url += '&payment_method=' + paymentMethod;
+            }
+
+            // Redirect ke URL dengan parameter filter yang sesuai
+            window.location.href = url;
         });
+
 
         $('#filterPaymentMethodForm').submit(function (e) {
             e.preventDefault();
@@ -199,4 +245,78 @@
         }
     }
 </script>
+<script>
+    $(document).ready(function() {
+        $('#printPDF').click(function() {
+            // Mendapatkan HTML dari kolom yang diinginkan
+            var tbodyHtml = '';
+            $('.table-penjualan tbody tr').each(function(index) {
+                tbodyHtml += `
+                    <tr>
+                        <td style="border-right: 1px solid #ddd; font-size: 9px;">${$(this).find('td:eq(0)').text()}</td>
+                        <td style="border-right: 1px solid #ddd; font-size: 9px;">${$(this).find('td:eq(1)').text()}</td>
+                        <td style="border-right: 1px solid #ddd; font-size: 9px;">${$(this).find('td:eq(2)').text()}</td>
+                        <td style="border-right: 1px solid #ddd; font-size: 9px;">${$(this).find('td:eq(3)').text()}</td>
+                        <td style="border-right: 1px solid #ddd; font-size: 9px;">${$(this).find('td:eq(4)').text()}</td>
+                        <td style="border-right: 1px solid #ddd; font-size: 9px;">${$(this).find('td:eq(5)').text()}</td>
+                        <td style="border-right: 1px solid #ddd; font-size: 9px;">${$(this).find('td:eq(6)').text()}</td>
+                        <td style="border-right: 1px solid #ddd; font-size: 9px;">${$(this).find('td:eq(7)').text()}</td>
+                        <td style="border-right: 1px solid #ddd; font-size: 9px;">${$(this).find('td:eq(8)').text()}</td>
+                        <td style="font-size: 9px;">${$(this).find('td:eq(9)').text()}</td>
+                    </tr>`;
+            });
+
+            // Mendapatkan HTML dari total pendapatan
+            var tfootHtml = $('.table-penjualan tfoot').html();
+
+            // Membuat konten untuk tabel dengan menambahkan thead dan tbody
+            var tableHtml = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th style="border-right: 1px solid #ddd; font-size: 9px;">No</th>
+                            <th style="border-right: 1px solid #ddd; font-size: 9px;">Tanggal</th>
+                            <th style="border-right: 1px solid #ddd; font-size: 9px;">Nama</th>
+                            <th style="border-right: 1px solid #ddd; font-size: 9px;">Usia</th>
+                            <th style="border-right: 1px solid #ddd; font-size: 9px;">Metode Pembayaran</th>
+                            <th style="border-right: 1px solid #ddd; font-size: 9px;">Kode Member</th>
+                            <th style="border-right: 1px solid #ddd; font-size: 9px;">Total Item</th>
+                            <th style="border-right: 1px solid #ddd; font-size: 9px;">Total Harga</th>
+                            <th style="border-right: 1px solid #ddd; font-size: 9px;">Diskon</th>
+                            <th style="font-size: 9px;">Total Bayar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tbodyHtml}
+                    </tbody>
+                </table>`;
+
+            // Membuka jendela baru untuk mencetak laporan
+            var newWindow = window.open('', '_blank');
+            newWindow.document.write('<html><head><title>Laporan Penjualan</title><style>body { font-family: Arial, sans-serif; } table { width: 100%; border-collapse: collapse; } th, td { padding: 4px; text-align: left; border-bottom: 1px solid #ddd; } th { background-color: #f2f2f2; }</style></head><body>');
+            newWindow.document.write('<h1 style="text-align: center; font-size: 12px;">Laporan Penjualan</h1>');
+            newWindow.document.write(tableHtml);
+
+            // Menambahkan tfoot hanya di halaman terakhir
+            if ($('.table-penjualan').DataTable().page.info().end === $('.table-penjualan tbody tr').length) {
+                newWindow.document.write('<table style="width: 100%; border-collapse: collapse;"><tfoot>' + tfootHtml + '</tfoot></table>');
+            }
+            
+            newWindow.document.write('</body></html>');
+            newWindow.document.close();
+
+            // Mencetak laporan
+            newWindow.print();
+        });
+    });
+
+</script>
+
+
+
+
+
+
+
+
 @endpush

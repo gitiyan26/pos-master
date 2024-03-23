@@ -5,7 +5,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title">Pilih Member</h4>
-            </div>
+            </div>  
             <div class="modal-body">
                 <table class="table table-striped table-bordered table-member">
                     <thead>

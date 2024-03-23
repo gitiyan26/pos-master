@@ -197,6 +197,7 @@
             }, 300);
         });
         table2 = $('.table-produk').DataTable();
+        table3 = $('.table-member').DataTable();
 
         $(document).on('input', '.quantity', function () {
             let id = $(this).data('id');
@@ -290,6 +291,7 @@
         loadForm($('#diskon').val());
         $('#diterima').val(0).focus().select();
         hideMember();
+        tampilMember()
     }
 
     function hideMember() {
